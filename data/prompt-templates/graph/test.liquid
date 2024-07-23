@@ -1,0 +1,27 @@
+--- BEFORE: FICTION ---
+{% assign MAX_CHARS = 100 %}
+{% capture EXAMPLES %}
+  {% # performs a vector search based on {{ CONTEXT }} text, and returns top #3 results %}
+  {% archive_search BY_VAR='CONTEXT' RESULTS=3 %}
+{% endcapture %}
+
+--- FICTION ---
+Generate a fiction text of 50 words.
+
+EXAMPLES: 
+{{ EXAMPLES }}
+
+--- AFTER: FICTION ---
+{% if LAST_RESULT_LENGTH > MAX_CHARS %}
+  {% goto SHORTEN %}
+{% endif %}
+
+--- SHORTEN ---
+Shorten the text.
+
+--- AFTER: SHORTEN ---
+{% if LAST_RESULT_LENGTH > MAX_CHARS %}
+  {% goto SHORTEN %}
+{% else %}
+  {% done %}
+{% endif %}
