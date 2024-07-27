@@ -1,27 +1,41 @@
---- BEFORE: FICTION ---
-{% assign MAX_CHARS = 100 %}
-{% capture EXAMPLES %}
-  {% # performs a vector search based on {{ CONTEXT }} text, and returns top #3 results %}
-  {% archive_search BY_VAR='CONTEXT' RESULTS=3 %}
-{% endcapture %}
 
---- FICTION ---
-Generate a fiction text of 50 words.
+--- PROMPT write fiction ---
+{% assign max_chars = 1000 %}
+{% capture examples %}
+  {% # performs a vector search based on {{ user_context }} text, and returns top #3 results %}
+  {% examples query='{{ user_context }}' count = 3 %}
+{% endcapture %}
+{% assign model = 'openai/gpt-4-turbo' %}
+{% assign temperature = 0.7 %}
+
+Generate a {% if max_chars < 1000 %}short{% endif %} fiction text of max. {% wordcount chars='{{ max_chars }}' %} words.
 
 EXAMPLES: 
-{{ EXAMPLES }}
+{{ examples }}
 
---- AFTER: FICTION ---
-{% if LAST_RESULT_LENGTH > MAX_CHARS %}
-  {% goto SHORTEN %}
+{% field FORMAT = "{ label: 'Format', default: 'Blog post' }" %}
+
+--- AFTER write fiction ---
+{% if prev_generation_chars > max_chars %}
+  {% goto shorten %}
+{% else %}
+  {% done %}
 {% endif %}
 
---- SHORTEN ---
-Shorten the text.
+--- PROMPT shorten ---
+{% assign model = 'anthropic/claude-sonnet-3.5' %}
+{% assign temperature = 0.01 %}
 
---- AFTER: SHORTEN ---
-{% if LAST_RESULT_LENGTH > MAX_CHARS %}
-  {% goto SHORTEN %}
+Shorten the text following text to {% chars_to_words assign='{{ max_chars }}' %} words:
+
+{{ prev_generation_text }}
+
+{% field ASPECT = "{ label: 'Aspect', default: 'Foo' }" %}
+{% field ASPECT2 = "{ label: 'Aspect2', default: 'Foo' }" %}
+
+--- AFTER shorten ---
+{% if prev_generation_chars > max_chars %}
+  {% goto shorten %} // FIXME: repeat!
 {% else %}
   {% done %}
 {% endif %}
