@@ -1,8 +1,8 @@
-import type { TagFn } from "../interfaces";
+import type { SyncTagFn } from "../interfaces";
 
 /** 
   {% done %}
 */
-export const defineDoneTag: TagFn = (_tagName, ctx) => {
-  ctx.outputValues.CONTROL_FLOW_DONE = true;
+export const defineDoneTag: SyncTagFn = (_tagName, ctx) => {
+  ctx.output.CONTROL_FLOW_DONE = true;
 };

@@ -1,58 +1,71 @@
-import type { StringMap, PromptStep, PromptOptions } from "./interfaces";
+import type {
+  StringMap,
+  PromptOptions,
+  PromptParsed,
+  PlanModeResult,
+} from "./interfaces";
 import { parsePrompts, parseSingle } from "./parser";
 
-export const defaultParseOpts: PromptOptions = {
+export const defaultOpts: PromptOptions = {
   tags: {},
+  syncTags: {},
 };
 
 /** preprocessor for meta data followed by liquid compilation pass */
 export const plan = async (
-  promptTemplate: string,
-  inputValues: StringMap = {},
-  parseOpts: PromptOptions = defaultParseOpts,
-): Promise<Array<PromptStep>> => {
-  parseOpts = {
-    ...defaultParseOpts,
-    ...parseOpts,
+  tpl: string,
+  input: StringMap = {},
+  opts: PromptOptions = defaultOpts,
+): Promise<PlanModeResult> => {
+  opts = {
+    ...defaultOpts,
+    ...opts,
     mode: "plan",
   };
 
-  const promptList = parsePrompts(promptTemplate).reverse();
+  const promptList = parsePrompts(tpl).reverse();
 
-  const parseResults: Array<PromptStep> = [];
+  const parseResults: Array<PromptParsed> = [];
   let prevSinglePromptResultIndex = -1;
 
   // reverse for simple association
   for (let i = 0; i < promptList.length; i++) {
     const singlePrompt = promptList[i];
-    let singlePromptResult: PromptStep;
+    let parsed: PromptParsed;
 
     if (singlePrompt.type === "template") {
-      singlePromptResult = await parseSingle(
-        singlePrompt.label || "",
-        singlePrompt.template || "",
-        inputValues,
-        parseOpts,
-      );
-      singlePromptResult.instruction = "PROMPT";
-      singlePromptResult.label = singlePrompt.label;
-      parseResults.push(singlePromptResult);
+      parsed = await parseSingle(singlePrompt, input, opts);
+      parsed.instruction = "PROMPT";
+      parseResults.push(parsed);
       prevSinglePromptResultIndex = parseResults.length - 1;
     } else if (
       singlePrompt.type === "preamble" &&
       singlePrompt.instruction === "AFTER" &&
       parseResults[prevSinglePromptResultIndex]
     ) {
-      parseResults[prevSinglePromptResultIndex].label = singlePrompt.label;
+      parseResults[prevSinglePromptResultIndex].name = singlePrompt.label || "";
       parseResults[prevSinglePromptResultIndex].instruction = "AFTER";
     } else if (
       singlePrompt.type === "preamble" &&
       singlePrompt.instruction === "PROMPT" &&
       parseResults[prevSinglePromptResultIndex]
     ) {
-      parseResults[prevSinglePromptResultIndex].label = singlePrompt.label;
+      parseResults[prevSinglePromptResultIndex].name = singlePrompt.label || "";
       parseResults[prevSinglePromptResultIndex].instruction = "PROMPT";
     }
   }
-  return parseResults.reverse().filter((node) => node.promptTemplate);
+
+  const sanizizedOrderedPromptParseResults = parseResults
+    .reverse()
+    .filter((node) => node.tpl);
+
+  return {
+    prompts: sanizizedOrderedPromptParseResults,
+    errors: sanizizedOrderedPromptParseResults
+      .map((node) => node.error || "")
+      .filter(Boolean),
+    output: sanizizedOrderedPromptParseResults.reduce((acc, node) => {
+      return { ...acc, ...node.output };
+    }, {}),
+  };
 };

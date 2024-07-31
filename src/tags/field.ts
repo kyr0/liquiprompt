@@ -1,5 +1,5 @@
 import JSON5 from "json5";
-import type { FieldParseResult, TagFn } from "../interfaces";
+import type { FieldParseResult, SyncTagFn } from "../interfaces";
 
 export const defaultMeta = (
   meta: Record<string, FieldParseResult>,
@@ -45,7 +45,7 @@ export const autoDetectType = (value: FieldParseResult): string => {
 
   {% field FIELD_NAME_2 = "{ options: ['bar', 'baz'] }" %} 
 */
-export const defineFieldTag: TagFn = (
+export const defineFieldTag: SyncTagFn = (
   _tagName,
   ctx,
   values,
@@ -63,29 +63,28 @@ export const defineFieldTag: TagFn = (
     value.key = key;
 
     // evaluate default value
-    ctx.outputValues[key] = ctx.inputValues[key] ?? value.default;
+    ctx.output[key] = ctx.input[key] ?? value.default;
 
-    if (!ctx.outputValues.PROMPT_FIELDS) {
-      ctx.outputValues.PROMPT_FIELDS = {};
+    if (!ctx.output.PROMPT_FIELDS) {
+      ctx.output.PROMPT_FIELDS = {};
     }
 
-    defaultMeta(ctx.outputValues.PROMPT_FIELDS, key);
+    defaultMeta(ctx.output.PROMPT_FIELDS, key);
 
     // meta data merge
-    ctx.outputValues.PROMPT_FIELDS[key].default = value.default;
+    ctx.output.PROMPT_FIELDS[key].default = value.default;
 
-    ctx.outputValues.PROMPT_FIELDS[key].label = value.label ?? key;
+    ctx.output.PROMPT_FIELDS[key].label = value.label ?? key;
 
-    ctx.outputValues.PROMPT_FIELDS[key].type =
-      value.type ?? autoDetectType(value);
+    ctx.output.PROMPT_FIELDS[key].type = value.type ?? autoDetectType(value);
 
-    ctx.outputValues.PROMPT_FIELDS[key].order = instance.fieldIndex;
+    ctx.output.PROMPT_FIELDS[key].order = instance.fieldIndex;
 
     if (value.options && Array.isArray(value.options)) {
-      if (ctx.outputValues.PROMPT_FIELDS[key].default) {
-        ctx.outputValues.PROMPT_FIELDS[key].default = String(value.options[0]);
+      if (ctx.output.PROMPT_FIELDS[key].default) {
+        ctx.output.PROMPT_FIELDS[key].default = String(value.options[0]);
       }
-      ctx.outputValues.PROMPT_FIELDS[key].options = value.options.map((v) =>
+      ctx.output.PROMPT_FIELDS[key].options = value.options.map((v) =>
         String(v),
       );
     }

@@ -7,10 +7,12 @@ import {
   type TopLevelToken,
 } from "liquidjs";
 import type {
+  AsyncTagFn,
   DefaultTag,
   PromptContext,
   PromptOptions,
   StringMap,
+  SyncTagFn,
   TagHash,
   TagRegisterFn,
   TagRegistrationMap,
@@ -20,10 +22,10 @@ import { defineGotoTag } from "./tags/goto";
 import { defineDoneTag } from "./tags/done";
 import { defineWordcountTag } from "./tags/wordcount";
 import { defineExamplesTag } from "./tags/examples";
-import { parseValueExpression } from "./parser";
+import { parseTagHashValues } from "./parser";
 import { runGenerator } from "./generator";
 
-export const builtInTags: TagRegistrationMap = {
+export const builtInTags: TagRegistrationMap<SyncTagFn> = {
   field: defineFieldTag,
   goto: defineGotoTag,
   done: defineDoneTag,
@@ -33,57 +35,23 @@ export const builtInTags: TagRegistrationMap = {
 
 export const registerTags = (
   engine: Liquid,
-  opts: PromptContext,
-  parseOpts: PromptOptions,
+  ctx: PromptContext,
+  opts: PromptOptions,
+  tags: TagRegistrationMap<SyncTagFn | AsyncTagFn>,
+  type: "async" | "sync",
 ) => {
-  // TODO: register tags by sync or async, default async, combined
+  const registerFunction = type === "async" ? defineAsyncTag : defineSyncTag;
   try {
-    const tagNames = Object.keys(builtInTags);
-
-    // register built-in tags (sync)
+    const tagNames = Object.keys(tags);
     for (const tagName of tagNames) {
-      engine.registerTag(tagName, defineSyncTag(tagName, opts, parseOpts));
+      engine.registerTag(
+        tagName,
+        registerFunction(tagName, ctx, opts, tags[tagName]),
+      );
     }
   } catch (e) {
     console.error("ERROR registerTags", e);
   }
-
-  // register custom tags (async)
-  Object.keys(parseOpts.tags || []).forEach((tagName) => {
-    engine.registerTag(tagName, defineAsyncTag(tagName, opts, parseOpts));
-  });
-  return engine;
-};
-
-export const parseTagHashValues = (
-  hash: TagHash,
-  outputValues: StringMap,
-  inputValues: StringMap,
-): StringMap => {
-  const keys = Object.keys(hash);
-  const values: StringMap = {};
-
-  // generalized hash value allocation including input parameter lookup
-  for (const key of keys) {
-    if (typeof hash[key] === "undefined" || typeof hash[key] !== "string") {
-      continue;
-    }
-
-    const valueExpression = parseValueExpression(hash[key] as string);
-
-    // output variables precede in priority (closer context)
-    if (valueExpression.type === "variable") {
-      valueExpression.value = outputValues[valueExpression.label!];
-
-      // if no output value can be found as variable, try to use an input variable
-      if (typeof valueExpression.value === "undefined") {
-        valueExpression.value = inputValues[valueExpression.label!];
-      }
-    }
-    // assign value, original value or empty string
-    values[key] = valueExpression.value || "";
-  }
-  return values;
 };
 
 export const getHash = (tagTokenValue: string): Hash => {
@@ -106,9 +74,10 @@ export const getHash = (tagTokenValue: string): Hash => {
 };
 
 export const defineSyncTag: TagRegisterFn = (
-  tagName: string,
+  tagName,
   defineTagOpts,
   parseOpts,
+  tagFn,
 ) =>
   class BuiltInTag extends Tag implements DefaultTag {
     hash: Hash;
@@ -125,13 +94,13 @@ export const defineSyncTag: TagRegisterFn = (
     *render(ctx: Context) {
       const values = parseTagHashValues(
         yield this.hash.render(ctx),
-        defineTagOpts.outputValues,
-        defineTagOpts.inputValues,
+        defineTagOpts.output,
+        defineTagOpts.input,
       );
 
       let renderString = "";
-      if (typeof builtInTags[tagName] === "function") {
-        renderString = builtInTags[tagName](
+      if (typeof tagFn === "function") {
+        renderString = tagFn(
           tagName,
           defineTagOpts,
           values,
@@ -147,6 +116,7 @@ export const defineAsyncTag: TagRegisterFn = (
   tagName: string,
   defineTagOpts,
   parseOpts,
+  tagFn,
 ) =>
   class CustomTag extends Tag implements DefaultTag {
     hash: Hash;
@@ -179,20 +149,14 @@ export const defineAsyncTag: TagRegisterFn = (
 
       const values = parseTagHashValues(
         tagHash,
-        defineTagOpts.outputValues,
-        defineTagOpts.inputValues,
+        defineTagOpts.output,
+        defineTagOpts.input,
       );
       let renderString = "";
 
-      if (typeof parseOpts.tags![tagName] === "function") {
+      if (typeof tagFn === "function") {
         renderString =
-          (await parseOpts.tags![tagName](
-            tagName,
-            defineTagOpts,
-            values,
-            parseOpts,
-            this,
-          )) || "";
+          (await tagFn(tagName, defineTagOpts, values, parseOpts, this)) || "";
       }
       return renderString || "";
     }

@@ -33,6 +33,7 @@
     "@biomejs/biome": "^1.6.4",
     "dotenv": "^16.4.5",
     "pkgroll": "^2.1.1",
+    "prettyjson": "^1.2.5",
     "spawn-please": "^3.0.0",
     "tsx": "^4.16.2",
     "typescript": "^5.0.0",

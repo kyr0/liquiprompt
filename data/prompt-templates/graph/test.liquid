@@ -13,8 +13,6 @@ Generate a {% if max_chars < 1000 %}short{% endif %} fiction text of max. {% wor
 EXAMPLES: 
 {{ examples }}
 
-{% field FORMAT = "{ label: 'Format', default: 'Blog post' }" %}
-
 --- AFTER write fiction ---
 {% if prev_generation_chars > max_chars %}
   {% goto shorten %}
@@ -30,12 +28,9 @@ Shorten the text following text to {% chars_to_words assign='{{ max_chars }}' %}
 
 {{ prev_generation_text }}
 
-{% field ASPECT = "{ label: 'Aspect', default: 'Foo' }" %}
-{% field ASPECT2 = "{ label: 'Aspect2', default: 'Foo' }" %}
-
 --- AFTER shorten ---
 {% if prev_generation_chars > max_chars %}
-  {% goto shorten %} // FIXME: repeat!
+  {% goto shorten %}
 {% else %}
   {% done %}
 {% endif %}

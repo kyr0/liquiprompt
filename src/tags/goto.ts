@@ -1,8 +1,8 @@
-import type { TagFn } from "../interfaces";
+import type { SyncTagFn } from "../interfaces";
 
 /** 
   {% goto shorten %}
 */
-export const defineGotoTag: TagFn = (_tagName, ctx, values) => {
-  ctx.outputValues.CONTROL_FLOW_GOTO = Object.keys(values)[0];
+export const defineGotoTag: SyncTagFn = (_tagName, ctx, values) => {
+  ctx.output.CONTROL_FLOW_GOTO = Object.keys(values)[0];
 };
