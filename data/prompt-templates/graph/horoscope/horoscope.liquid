@@ -1,0 +1,56 @@
+--- PROMPT generate_horoscope ---
+{% assign min_chars = 2000 %}
+{% assign model = 'openai/gpt-4o' %}
+{% assign temperature = 0.7 %}
+
+Generate a detailed horoscope for someone with the sign {{ zodiac_sign }}.
+
+Include the following sections:
+- General outlook for the week
+- Love and relationships
+- Career and finances  
+- Health and wellness
+- Personal growth
+
+Make it personalized and insightful.
+
+--- AFTER generate_horoscope ---
+{% if prev_generation_chars < min_chars %}
+  {% goto extend_horoscope %}
+{% else %}
+  {% done %}
+{% endif %}
+
+--- PROMPT extend_horoscope ---
+{% assign model = 'anthropic/claude-sonnet-3.7' %}
+{% assign temperature = 0.8 %}
+
+The following horoscope is too short. Please extend it with more details and personalized insights:
+
+{{ prev_generation_text }}
+
+Add more specific advice on how the {{ zodiac_sign }} sign can make the most of upcoming opportunities, especially in:
+- Handling challenges that might arise
+- Building stronger relationships
+- Taking advantage of favorable planetary alignments
+- Developing personal strengths
+
+--- AFTER extend_horoscope ---
+{% if prev_generation_chars < min_chars %}
+  {% goto final_polish %}
+{% else %}
+  {% done %}
+{% endif %}
+
+--- PROMPT final_polish ---
+{% assign model = 'anthropic/claude-sonnet-3.7' %}
+{% assign temperature = 0.4 %}
+
+Polish and refine this horoscope to make it more engaging and personalized:
+
+{{ prev_generation_text }}
+
+Ensure the tone is positive and empowering while maintaining accuracy for the {{ zodiac_sign }} sign.
+
+--- AFTER final_polish ---
+{% done %}

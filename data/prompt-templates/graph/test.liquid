@@ -5,7 +5,7 @@
   {% # performs a vector search based on {{ user_context }} text, and returns top #3 results %}
   {% examples query='{{ user_context }}' count = 3 %}
 {% endcapture %}
-{% assign model = 'openai/gpt-4-turbo' %}
+{% assign model = 'openai/gpt-4o' %}
 {% assign temperature = 0.7 %}
 
 Generate a {% if max_chars < 1000 %}short{% endif %} fiction text of max. {% chars_to_words chars='{{ max_chars }}' %} words.
@@ -21,7 +21,7 @@ EXAMPLES:
 {% endif %}
 
 --- PROMPT shorten ---
-{% assign model = 'anthropic/claude-sonnet-3.5' %}
+{% assign model = 'anthropic/claude-sonnet-3.7' %}
 {% assign temperature = 0.01 %}
 
 Shorten the text following text to {% chars_to_words assign='{{ max_chars }}' %} words:
