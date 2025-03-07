@@ -13,7 +13,7 @@ export interface VercelAIPromptOptions {
 }
 
 // Convert to format compatible with cross-llm PromptResponse
-const formatResponse = (result: string): PromptResponse => {
+export const formatResponse = (result: string): PromptResponse => {
   return {
     provider: "vercel-ai",
     data: [{ text: result }],
