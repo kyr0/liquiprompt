@@ -8,7 +8,7 @@
 {% assign model = 'openai/gpt-4-turbo' %}
 {% assign temperature = 0.7 %}
 
-Generate a {% if max_chars < 1000 %}short{% endif %} fiction text of max. {% wordcount chars='{{ max_chars }}' %} words.
+Generate a {% if max_chars < 1000 %}short{% endif %} fiction text of max. {% chars_to_words chars='{{ max_chars }}' %} words.
 
 EXAMPLES: 
 {{ examples }}

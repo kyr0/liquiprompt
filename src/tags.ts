@@ -20,7 +20,7 @@ import type {
 import { defineFieldTag } from "./tags/field";
 import { defineGotoTag } from "./tags/goto";
 import { defineDoneTag } from "./tags/done";
-import { defineWordcountTag } from "./tags/wordcount";
+import { defineCharsToWordsTag } from "./tags/wordcount";
 import { defineExamplesTag } from "./tags/examples";
 import { parseTagHashValues } from "./parser";
 import { runGenerator } from "./generator";
@@ -29,7 +29,7 @@ export const builtInTags: TagRegistrationMap<SyncTagFn> = {
   field: defineFieldTag,
   goto: defineGotoTag,
   done: defineDoneTag,
-  wordcount: defineWordcountTag,
+  chars_to_words: defineCharsToWordsTag,
   examples: defineExamplesTag,
 };
 

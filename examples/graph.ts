@@ -17,7 +17,7 @@ const result = await plan(graphPrompt, {
         case "write fiction":
           ctx.input = {
             ...ctx.input,
-            LALA: 123
+            TEST: 123
           }
           break;
       }

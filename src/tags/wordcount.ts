@@ -1,9 +1,9 @@
 import type { SyncTagFn } from "../interfaces";
 
 /** 
-  {% wordcount chars='{{ max_chars }}' %}
+  {% chars_to_words chars='{{ max_chars }}' %}
 */
-export const defineWordcountTag: SyncTagFn = (_tagName, ctx, values) => {
+export const defineCharsToWordsTag: SyncTagFn = (_tagName, ctx, values) => {
   const chars: number =
     typeof values.chars === "string" ? Number.parseInt(values.chars) : 0;
 
