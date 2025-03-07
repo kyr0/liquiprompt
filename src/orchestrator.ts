@@ -1,18 +1,31 @@
-import { systemPromptStreaming, type PromptResponse } from "cross-llm";
+import { type PromptResponse, systemPromptStreaming } from "cross-llm";
 import type {
   LiquiPrompt,
   PromptInput,
   PromptInstruction,
   PromptStep,
 } from "./interfaces";
+import {
+  claudePrompt,
+  claudePromptStreaming,
+  openaiPrompt,
+  openaiPromptStreaming,
+} from "./providers/vercel-ai";
 
-// llm provider connector glue code (using cross-llm)
+// llm provider connector glue code
 export {
-  embed,
   systemPromptStreaming,
   systemPrompt,
   type PromptResponse,
 } from "cross-llm";
+
+// Export Vercel AI SDK implementations
+export {
+  openaiPrompt,
+  openaiPromptStreaming,
+  claudePrompt,
+  claudePromptStreaming,
+};
 // TODO: getModelDefaults('provider', 'modelName') => { temperature: 0.7, ... }
 
 // simple orchestrator for synchronous prompt workflow execution
@@ -76,13 +89,14 @@ const findPromptBy = (
     return (
       liquiPrompt.find(
         (prompt) =>
-          toComparatorValue(prompt.label) === toComparatorValue(selector) &&
-          prompt.instruction === promptInstruction,
+          toComparatorValue((prompt as any).label) === toComparatorValue(selector) &&
+          (prompt as any).instruction === promptInstruction,
       ) || []
     );
   }
   return liquiPrompt[selector as number];
 };
+
 
 /*
 const runStep = async (

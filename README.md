@@ -12,6 +12,48 @@ EXPERIMENTAL. This repository is work in progress.
 
 > 🔬 The more complicated LLM apps get, the harder it becomes to maintain them. What if you could program an LLM like you can program a computer?
 
+## 🛠️ LLM Providers
+
+LiquiPrompt supports multiple LLM providers:
+
+* **OpenAI** - Using both the [cross-llm](https://www.npmjs.com/package/cross-llm) package and [Vercel AI SDK](https://www.npmjs.com/package/ai)
+* **Anthropic Claude** - Using both the [cross-llm](https://www.npmjs.com/package/cross-llm) package and [Vercel AI SDK](https://www.npmjs.com/package/ai)
+
+### Using Vercel AI SDK
+
+```typescript
+import { plan } from "liquiprompt";
+import { openaiPrompt, claudePrompt } from "liquiprompt/orchestrator";
+
+// Compile your prompt template
+const compileResult = await plan(yourPromptTemplate);
+
+// Execute with OpenAI
+const openaiResponse = await openaiPrompt(
+  compileResult.prompts[0].prompt,
+  "gpt-3.5-turbo",
+  { temperature: 0.7 }
+);
+
+// Execute with Claude
+const claudeResponse = await claudePrompt(
+  compileResult.prompts[0].prompt,
+  "claude-3-sonnet-20240229",
+  { temperature: 0.7 }
+);
+```
+
+To run the Vercel AI SDK example:
+
+```bash
+# Set your API keys in .env file or environment
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+
+# Run the example
+npm run example -- vercel-ai
+```
+
 ## 💡 Example
 
 The following prompt would limit the generated fiction text to maximum 1000 chars by iterating until the goal is reached.

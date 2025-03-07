@@ -21,13 +21,22 @@
     "example": "tsx ./scripts/run-example.ts",
     "build": "pkgroll"
   },
-  "files": ["dist", "README.md", "LICENSE", "package.json"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "author": "Aron Homberg <info@aron-homberg.de>",
   "license": "MIT",
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.1.15",
+    "@ai-sdk/openai": "^1.2.1",
+    "ai": "^4.1.54",
     "cross-llm": "^0.1.3",
     "json5": "^2.2.3",
-    "liquidjs": "^10.15.0"
+    "liquidjs": "^10.15.0",
+    "openai": "^4.86.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.6.4",
