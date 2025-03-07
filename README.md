@@ -12,6 +12,17 @@ EXPERIMENTAL. This repository is work in progress.
 
 > 🔬 The more complicated LLM apps get, the harder it becomes to maintain them. What if you could program an LLM like you can program a computer?
 
+## 🚀 Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Set up your API keys in .env file 
+# (copy from env.example and add your keys)
+cp env.example .env
+```
+
 ## 🛠️ LLM Providers
 
 LiquiPrompt supports multiple LLM providers:
@@ -54,15 +65,33 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 npm run example -- vercel-ai
 ```
 
+## 🏃‍♂️ Running Examples
+
+To run the available examples:
+
+```bash
+# Run one-shot prompt example
+npm run example -- one-shot
+
+# Run graph workflow example (with mocks)
+npm run example -- graph
+
+# Run horoscope example (with mocks)
+npm run example -- horoscope
+
+# Run real horoscope example (makes real API calls)
+# You can pass a zodiac sign as an argument
+npm run example -- real-horoscope Scorpio
+```
+
+> **Note:** Make sure to set up your API keys in a `.env` file or environment variables when running examples that make real API calls (like `real-horoscope`).
+
 ## 💡 Example
 
 The following prompt would limit the generated fiction text to maximum 1000 chars by iterating until the goal is reached.
-It would also perform a few-shot exemplar optimitation so that the generated fiction text is 
+It would also perform a few-shot exemplar optimization so that the generated fiction text is based on similar examples:
 
 ```liquid
-
-
-
 
 --- PROMPT write fiction ---
 {% use max_chars = 1000 %}

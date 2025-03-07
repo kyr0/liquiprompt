@@ -5,7 +5,13 @@ if (!process.argv[2] || !process.argv[2].trim()) {
   process.exit(0);
 }
 
-const { stdout, stderr } = await spawn('tsx', [`./examples/${process.argv[2]}`]);
+// Get the script name and any arguments
+const scriptName = process.argv[2];
+const scriptArgs = process.argv.slice(3);
+
+// Execute the script with arguments if provided
+const args = [`./examples/${scriptName}.ts`, ...scriptArgs];
+const { stdout, stderr } = await spawn('tsx', args);
 
 if (stdout) {
   console.log(stdout);
