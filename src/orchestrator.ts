@@ -36,7 +36,7 @@ export interface ControlVariables {
 }
 
 export const ControlVariablesDefaults: ControlVariables = {
-  model: "gpt-3",
+  model: "openai/gpt-4o",
   temperature: 0.7,
 };
 
@@ -141,25 +141,35 @@ const runStep = async (
       
       // Execute the prompt if not in simulation mode
       if (mode === "execution") {
-        // Execute prompt based on model type
-        if (model.includes('openai')) {
-          response = await openaiPrompt(promptStep.prompt, {
-            model: model.replace('openai/', ''),
-            temperature
-          });
-          generatedText = response.text;
-        } else if (model.includes('anthropic')) {
-          response = await claudePrompt(promptStep.prompt, {
-            model: model.replace('anthropic/', ''),
-            temperature
-          });
-          generatedText = response.text;
-        } else {
-          // Default to cross-llm
-          response = await systemPrompt(promptStep.prompt, model, {
-            temperature
-          });
-          generatedText = response.data[0].text;
+        try {
+          // Execute prompt based on model type
+          if (model.includes('openai')) {
+            const modelName = model.replace('openai/', '');
+            console.log(`Executing OpenAI prompt with model: ${modelName}, temperature: ${temperature}`);
+            response = await openaiPrompt(promptStep.prompt, modelName, {
+              temperature
+            });
+          } else if (model.includes('anthropic')) {
+            const modelName = model.replace('anthropic/', '');
+            console.log(`Executing Claude prompt with model: ${modelName}, temperature: ${temperature}`);
+            response = await claudePrompt(promptStep.prompt, modelName, {
+              temperature
+            });
+          } else {
+            // Don't use cross-llm at all - we should always use one of the specific providers
+            throw new Error(`Unsupported model provider: ${model}. Must use either 'openai/' or 'anthropic/' prefix.`);
+          }
+          
+          // Extract generated text from response
+          if (response && response.data && response.data[0]) {
+            generatedText = response.data[0].text;
+            console.log(`Generated ${generatedText.length} characters of text`);
+          } else {
+            throw new Error(`No valid response from model ${model}`);
+          }
+        } catch (error) {
+          console.error(`Error executing prompt with ${model}:`, error);
+          throw error;
         }
       } else {
         // In simulation mode, check if we have mock data
@@ -202,7 +212,7 @@ const runStep = async (
       };
     } else if (promptStep.instruction === "AFTER") {
       // Handle AFTER steps
-      onUpdate("STEP_AFTER", { step: promptStep.name });
+      onUpdate("STEP_AFTER", { step: promptStep.name, state: combinedInput });
       
       // Check for control flow directives
       if (promptStep.output[ControlFlowVariables.GOTO]) {

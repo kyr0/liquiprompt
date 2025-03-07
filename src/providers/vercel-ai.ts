@@ -29,21 +29,38 @@ export const formatResponse = (result: string): PromptResponse => {
 // OpenAI implementation using Vercel AI SDK
 export const openaiPrompt = async (
   prompt: string,
-  modelName = "gpt-3.5-turbo",
+  modelOrOptions: string | VercelAIPromptOptions = "gpt-4o",
   options: VercelAIPromptOptions = {},
 ): Promise<PromptResponse> => {
+  // Handle different parameter combinations
+  let modelName: string;
+  let opts: VercelAIPromptOptions;
+  
+  if (typeof modelOrOptions === "string") {
+    modelName = modelOrOptions;
+    opts = options || {};
+  } else {
+    modelName = modelOrOptions.model || "gpt-4o";
+    opts = modelOrOptions;
+  }
+  
   // Set API key in environment if provided in options
-  if (options.openaiApiKey || options.apiKey) {
-    process.env.OPENAI_API_KEY = options.openaiApiKey || options.apiKey;
+  if (opts.openaiApiKey || opts.apiKey) {
+    process.env.OPENAI_API_KEY = opts.openaiApiKey || opts.apiKey;
   }
 
   try {
+    // Combine all options
+    const temperature = opts.temperature || 0.7;
+    
+    console.log(`Calling OpenAI with model: ${modelName}, temperature: ${temperature}`);
+    
     const { text } = await generateText({
       model: openai(modelName),
       prompt,
-      system: options.system,
-      temperature: options.temperature || 0.7,
-      maxTokens: options.maxTokens,
+      system: opts.system,
+      temperature,
+      maxTokens: opts.maxTokens,
     });
 
     return formatResponse(text);
@@ -56,21 +73,38 @@ export const openaiPrompt = async (
 // Anthropic Claude implementation using Vercel AI SDK
 export const claudePrompt = async (
   prompt: string,
-  modelName = "claude-3-sonnet-20240229",
+  modelOrOptions: string | VercelAIPromptOptions = "claude-3-sonnet-20240229",
   options: VercelAIPromptOptions = {},
 ): Promise<PromptResponse> => {
+  // Handle different parameter combinations
+  let modelName: string;
+  let opts: VercelAIPromptOptions;
+  
+  if (typeof modelOrOptions === "string") {
+    modelName = modelOrOptions;
+    opts = options || {};
+  } else {
+    modelName = modelOrOptions.model || "claude-3-sonnet-20240229";
+    opts = modelOrOptions;
+  }
+  
   // Set API key in environment if provided in options
-  if (options.anthropicApiKey || options.apiKey) {
-    process.env.ANTHROPIC_API_KEY = options.anthropicApiKey || options.apiKey;
+  if (opts.anthropicApiKey || opts.apiKey) {
+    process.env.ANTHROPIC_API_KEY = opts.anthropicApiKey || opts.apiKey;
   }
 
   try {
+    // Combine all options
+    const temperature = opts.temperature || 0.7;
+    
+    console.log(`Calling Anthropic with model: ${modelName}, temperature: ${temperature}`);
+    
     const { text } = await generateText({
       model: anthropic(modelName),
       prompt,
-      system: options.system,
-      temperature: options.temperature || 0.7,
-      maxTokens: options.maxTokens,
+      system: opts.system,
+      temperature,
+      maxTokens: opts.maxTokens,
     });
 
     return formatResponse(text);
