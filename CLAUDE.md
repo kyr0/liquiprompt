@@ -7,11 +7,9 @@
 
 ## Code Style Guidelines
 - TypeScript with strict mode enabled, targeting ESNext
-- Biome for formatting/linting: `npx @biomejs/biome check --apply ./src`
-- Indentation: 2 spaces with LF line endings (80 char width)
-- Imports organized automatically via Biome
+- Indentation: 2 spaces with line width of 80 characters
 - Type annotations preferred, though `any` is permitted when necessary
-- Parameter reassignment allowed (noParameterAssign rule disabled)
+- Parameter reassignment allowed
 - Modern TypeScript practices with ESM modules
 - Favor async/await over promise chains
 - Use descriptive variable names and follow camelCase convention
