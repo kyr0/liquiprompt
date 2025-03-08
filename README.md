@@ -5,6 +5,15 @@
   > BASIC for prompt engineering.
 
   ### LiquiPrompt is a simple LLM prompt programming language to design and run RAG workflows.
+  
+  ## Key Features
+  
+  - 🔄 **Workflows** - Define complex, multi-step prompt workflows
+  - 🧩 **Templates** - Use Liquid syntax for powerful prompt templating
+  - 🏷️ **Custom Tags** - Extend functionality with custom tags
+  - 🔍 **Vector Search** - Find similar examples for few-shot learning
+  - 🧠 **Context Sharing** - Share data between prompts in a workflow
+  - 🔄 **Loops** - Iterate until conditions are met
 
 </span>
 
@@ -86,9 +95,12 @@ npm run example -- real-horoscope Scorpio
 # Run real horoscope with streaming output (experimental)
 # Note: The streaming output may show visual artifacts
 npm run example -- real-horoscope --stream Scorpio
+
+# Run examples tag demo - demonstrates vector similarity search
+npm run example -- examples-tag "Plan a website redesign project"
 ```
 
-> **Note:** Make sure to set up your API keys in a `.env` file or environment variables when running examples that make real API calls (like `real-horoscope`).
+> **Note:** Make sure to set up your API keys in a `.env` file or environment variables when running examples that make real API calls (like `real-horoscope` or `examples-tag`).
 
 ## 💡 Example
 
@@ -100,8 +112,8 @@ It would also perform a few-shot exemplar optimization so that the generated fic
 --- PROMPT write fiction ---
 {% use max_chars = 1000 %}
 {% capture examples %}
-  {% # performs a vector search based on {{ user_context }} text, and returns top #3 results %}
-  {% exemplar_few_shot var='user_context' results = 3 %}
+  {% # performs a vector search based on {{ user_context }} text, and returns similar examples %}
+  {% examples query='{{ user_context }}' count=3 source='data/examples' %}
 {% endcapture %}
 {% use model = 'openai/gpt-4-turbo' %}
 {% use temperature = 0.7 %}
