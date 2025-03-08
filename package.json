@@ -44,8 +44,7 @@
     "@vitest/coverage-v8": "^3.0.8",
     "dotenv": "^16.4.5",
     "pkgroll": "^2.1.1",
-    "prettyjson": "^1.2.5",
-    "spawn-please": "^3.0.0",
+    "prettyjson": "^1.2.5", 
     "tsx": "^4.16.2",
     "typescript": "^5.0.0",
     "vitest": "^1.6.0"

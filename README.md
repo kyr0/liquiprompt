@@ -82,6 +82,10 @@ npm run example -- horoscope
 # Run real horoscope example (makes real API calls)
 # You can pass a zodiac sign as an argument
 npm run example -- real-horoscope Scorpio
+
+# Run real horoscope with streaming output (experimental)
+# Note: The streaming output may show visual artifacts
+npm run example -- real-horoscope --stream Scorpio
 ```
 
 > **Note:** Make sure to set up your API keys in a `.env` file or environment variables when running examples that make real API calls (like `real-horoscope`).

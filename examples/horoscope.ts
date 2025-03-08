@@ -281,11 +281,14 @@ Remember, dear ${inputValues.zodiac_sign}, the stars may guide you, but you crea
         console.log(`\n> Running step: ${data.step}...`);
       } else if (eventType === "STEP_RESULT_CHUNK") {
         console.log(`> Generated text: ${data.result.text.length} characters`);
+      } else if (eventType === "STEP_RESULT_STREAM") {
+        // Don't log anything for streaming tokens to avoid cluttering the output
       } else if (eventType === "WORKFLOW_DONE") {
         console.log(`\n> Workflow completed!`);
       }
     },
-    "simulation" // Use simulation mode
+    "simulation", // Use simulation mode
+    "blocking"    // Use blocking mode to avoid streaming issues temporarily
   );
   
   // Display final result

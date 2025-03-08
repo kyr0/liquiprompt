@@ -6,6 +6,9 @@ import type {
 } from "./interfaces";
 import { parsePrompts, parseSingle } from "./parser";
 
+// Re-export parser functions
+export { parsePrompts as parse, parseSingle };
+
 export const defaultOpts: PromptOptions = {
   tags: {},
   syncTags: {},
