@@ -49,6 +49,6 @@
     "prettyjson": "^1.2.5",
     "tsx": "^4.16.2",
     "typescript": "^5.0.0",
-    "vitest": "^1.6.0"
+    "vitest": "^3.0.8"
   }
 }
